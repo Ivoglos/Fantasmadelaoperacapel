@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un Regalo Mágico - Navidad 🎄</title>
+    <!-- Importación de fuentes elegantes -->
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --oro: #d4af37;
+            --rojo-oscuro: #660000;
+            --rojo-brillante: #b3000c;
+            --blanco-nieve: #f0f0f0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle, #2c0000 0%, #000000 100%);
+            color: var(--blanco-nieve);
+            font-family: 'Playfair Display', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Efecto de Nieve Animada */
+        .snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            user-select: none;
+            z-index: 1000;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        /* Contenedor Principal Estilo Tarjeta */
+        .card {
+            background: linear-gradient(135deg, var(--rojo-oscuro) 0%, #3a0000 100%);
+            border: 4px double var(--oro);
+            border-radius: 15px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(212, 175, 55, 0.2);
+            position: relative;
+            z-index: 10;
+            transition: all 0.8s ease;
+        }
+
+        h1 {
+            font-family: 'Mountains of Christmas', cursive;
+            color: var(--oro);
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--oro);
+            border-radius: 5px;
+            padding: 12px;
+            color: white;
+            width: 80%;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border: 2px solid white;
+        }
+
+        button {
+            background: linear-gradient(to bottom, var(--oro), #a68a2d);
+            color: #2c0000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Playfair Display', serif;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .hidden {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .reveal {
+            display: block !important;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phantom-mask {
+            font-size: 4rem;
+            margin-top: 20px;
+            display: block;
+        }
+
+        .date-display {
+            color: var(--oro);
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="snow-container" id="snow"></div>
+
+    <!-- PANTALLA 1: INGRESO DE FECHA -->
+    <div class="card" id="step1">
+        <h1>¡Feliz Navidad!</h1>
+        <p>Una noche mágica les espera... <br>Por favor, ingresen el día elegido por la familia:</p>
+        <div class="input-group">
+            <input type="text" id="fechaInput" placeholder="Ej: 25 de Diciembre" autocomplete="off">
+        </div>
+        <button onclick="descubrirRegalo()">ENVIAR</button>
+    </div>
+
+    <!-- PANTALLA 2: REVELACIÓN -->
+    <div class="card hidden" id="step2">
+        <h1>¡Felicidades!</h1>
+        <p>Usted y toda su familia asistirán a una gala inolvidable:</p>
+        <h2 style="font-size: 2.2rem; margin: 10px 0; color: #fff; text-transform: uppercase; letter-spacing: 2px;">
+            El Fantasma de la Ópera
+        </h2>
+        <p>La cita es el día: <span class="date-display" id="fechaFinal"></span></p>
+        <span class="phantom-mask">🎭</span>
+        <p style="font-style: italic; font-size: 0.9rem; margin-top: 20px; color: var(--oro);">
+            Disfruten de la música de la noche...
+        </p>
+    </div>
+
+    <script>
+        // Crear nieve
+        function createSnowflake() {
+            const snow = document.getElementById('snow');
+            const flake = document.createElement('div');
+            const left = Math.random() * 100;
+            const duration = Math.random() * 3 + 2;
+            const size = Math.random() * 10 + 10;
+
+            flake.classList.add('snowflake');
+            flake.innerText = '❄';
+            flake.style.left = left + 'vw';
+            flake.style.fontSize = size + 'px';
+            flake.style.animationDuration = duration + 's';
+            flake.style.opacity = Math.random();
+
+            if (snow) snow.appendChild(flake);
+
+            setTimeout(() => {
+                flake.remove();
+            }, duration * 1000);
+        }
+
+        setInterval(createSnowflake, 100);
+
+        // Orquesta 8-bit completa del Fantasma
+        function playPhantomMusic() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+            
+            // Frecuencias de notas
+            const notes = {
+                'Bb2': 116.54, 'B2': 123.47, 'C3': 130.81, 'Db3': 138.59, 'D3': 146.83, 'Eb3': 155.56, 'E3': 164.81, 'F3': 174.61, 'Gb3': 185.00, 'G3': 196.00, 'Ab3': 207.65, 'A3': 220.00, 'Bb3': 233.08, 'B3': 246.94, 'C4': 261.63, 'Db4': 277.18, 'D4': 293.66, 'Eb4': 311.13, 'E4': 329.63, 'F4': 349.23, 'Gb4': 369.99, 'G4': 392.00
+            };
+
+            // Partitura: { n: nota, d: duración }
+            const score = [
+                // INTRO: El descenso icónico
+                { n: 'F3', d: 0.3 }, { n: 'E3', d: 0.3 }, { n: 'Eb3', d: 0.3 }, { n: 'D3', d: 0.3 }, { n: 'Db3', d: 1.0 },
+                { n: null, d: 0.2 },
+                { n: 'D3', d: 0.3 }, { n: 'Db3', d: 0.3 }, { n: 'C3', d: 0.3 }, { n: 'B2', d: 0.3 }, { n: 'Bb2', d: 1.2 },
+                { n: null, d: 0.4 },
+
+                // EL TEMA: "The Phantom of the Opera is there..."
+                { n: 'Bb2', d: 0.4 }, { n: 'Bb2', d: 0.4 }, { n: 'F3', d: 0.6 },
+                { n: 'Bb2', d: 0.4 }, { n: 'Bb2', d: 0.4 }, { n: 'F3', d: 0.6 },
+                { n: 'Bb2', d: 0.3 }, { n: 'C3', d: 0.3 }, { n: 'Db3', d: 0.3 }, { n: 'Eb3', d: 0.3 },
+                { n: 'F3', d: 0.8 }, { n: 'Gb3', d: 0.4 }, { n: 'F3', d: 0.8 },
+                
+                { n: null, d: 0.2 },
+
+                // ESCALADA CROMÁTICA DRAMÁTICA
+                { n: 'Bb2', d: 0.15 }, { n: 'C3', d: 0.15 }, { n: 'Db3', d: 0.15 }, { n: 'D3', d: 0.15 }, 
+                { n: 'Eb3', d: 0.15 }, { n: 'E3', d: 0.15 }, { n: 'F3', d: 0.15 }, { n: 'Gb3', d: 0.15 },
+                { n: 'G3', d: 0.15 }, { n: 'Ab3', d: 0.15 }, { n: 'A3', d: 0.15 }, { n: 'Bb3', d: 0.15 },
+                
+                // EL CLÍMAX (Subida de octava)
+                { n: 'F4', d: 0.6 }, { n: 'E4', d: 0.6 }, { n: 'Eb4', d: 0.6 }, { n: 'D4', d: 0.6 }, { n: 'Db4', d: 1.5 },
+                
+                // ACORDE FINAL TENEBROSO
+                { n: 'Bb2', d: 3.0 }
+            ];
+
+            let time = audioCtx.currentTime;
+
+            score.forEach((item, index) => {
+                if (item.n && notes[item.n]) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    // Cambiamos el timbre según la parte de la canción
+                    if (index < 12) {
+                        osc.type = 'sawtooth'; // Intro agresiva
+                    } else if (index > 25) {
+                        osc.type = 'square';   // Clímax digital
+                    } else {
+                        osc.type = 'triangle'; // Melodía suave
+                    }
+
+                    osc.frequency.setValueAtTime(notes[item.n], time);
+                    
+                    // Envolvente de volumen (ataque y desvanecimiento)
+                    gain.gain.setValueAtTime(0, time);
+                    gain.gain.linearRampToValueAtTime(0.2, time + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + item.d);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(time);
+                    osc.stop(time + item.d);
+                }
+                time += item.d;
+            });
+        }
+
+        function descubrirRegalo() {
+            const fechaInput = document.getElementById('fechaInput');
+            const fecha = fechaInput ? fechaInput.value : "";
+            
+            if (fecha.trim() === "") {
+                alert("Por favor, ingresen la fecha elegida");
+                return;
+            }
+
+            // Iniciar la música épica
+            playPhantomMusic();
+
+            // Transición de pantallas
+            const s1 = document.getElementById('step1');
+            const s2 = document.getElementById('step2');
+            const fFinal = document.getElementById('fechaFinal');
+
+            if (s1) s1.classList.add('hidden');
+            
+            setTimeout(() => {
+                if (s1) s1.style.display = 'none';
+                if (fFinal) fFinal.innerText = fecha;
+                if (s2) {
+                    s2.classList.remove('hidden');
+                    s2.classList.add('reveal');
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>
